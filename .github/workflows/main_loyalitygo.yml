@@ -43,36 +43,33 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+  
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
+      id-token: write
+      contents: read
+  
     steps:
+  
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: node-app
           path: ./artifact
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'loyalitygo'
-          slot-name: 'Production'
-          package: ./artifact
-      
+  
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2DC3B3B85FCC4B37B11F86D8DE7FC04E }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_272EDF2248B24EC7A8C151691CF316F8 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1A734254FB2B439DA6C44A8F21E0BC53 }}
-
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+  
+      - name: Verify artifact
+        run: |
+          ls -la ./artifact
+  
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'loyalitygo'
           slot-name: 'Production'
-          package: .
-          
+          package: ./artifact
